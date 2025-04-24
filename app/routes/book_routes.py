@@ -81,6 +81,7 @@ def create_book():
 @books_bp.get("")
 def get_all_books():
     query = db.select(Book).order_by(Book.id)
+    # we used the db.session object and called its scalars method to get a list of models. 
     books = db.session.scalars(query)
     # We could also write the line above as:
     # books = db.session.execute(query).scalars()
@@ -95,3 +96,38 @@ def get_all_books():
             }
         )
     return books_response
+
+################## 04 Building an API Read One Book
+@books_bp.get("/<book_id>")
+def get_one_book(book_id):
+    book = validate_book(book_id)
+
+    return {
+        "id": book.id,
+        "title": book.title,
+        "description": book.description,
+    }
+
+def validate_book(book_id):
+    try:
+        book_id = int(book_id)
+    except:
+        # When book_id is not a number
+        response = {"message": f"book {book_id} invalid"}
+        abort(make_response(response , 400))
+
+    # The query variable above receives a Select object representing the query for the data we are going to retrieve.
+    query = db.select(Book).where(Book.id == book_id)
+    # scalar method: only one result
+    # db.session has another method we can use, scalar, which will only return one result rather than a list.
+    book = db.session.scalar(query)
+    
+    # when we execute a query which selects no book records db.session.scalar(query) returns None! 
+    # When book_id does not exist in books
+    if not book:
+        response = {"message": f"book {book_id} not found"}
+        abort(make_response(response, 404))
+
+    return book
+
+################## END 04 Building an API Read One Book

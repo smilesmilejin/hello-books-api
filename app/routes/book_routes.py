@@ -68,6 +68,8 @@ def create_book():
     description = request_body["description"]
 
     new_book = Book(title=title, description=description)
+    
+    # db.session is the database's way of collecting changes that need to be made.
     db.session.add(new_book) # Add new_book to the database
     db.session.commit() # database commit the changes
 

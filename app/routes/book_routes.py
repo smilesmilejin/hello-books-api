@@ -153,5 +153,17 @@ def update_book(book_id):
     # Since we construct our own response object we need to set the mimetype for our response to "application/json". 
     return Response(status=204, mimetype="application/json")
 
-
 ################## END 04 Building an API Update
+
+
+################## 04 Building an API Delete
+
+@books_bp.delete("/<book_id>")
+def delete_book(book_id):
+    book = validate_book(book_id)
+    db.session.delete(book)
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
+
+################## END 04 Building an API Delete

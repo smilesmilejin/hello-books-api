@@ -55,7 +55,7 @@
 
 ################## 03 Building an API:Create
 
-from flask import Blueprint, abort, make_response, request
+from flask import Blueprint, abort, make_response, request, Response
 from app.models.book import Book
 from ..db import db
 
@@ -131,3 +131,27 @@ def validate_book(book_id):
     return book
 
 ################## END 04 Building an API Read One Book
+
+
+################## 04 Building an API Update
+
+# HTTP method: PUT, endpoint: /<book_id>
+@books_bp.put("/<book_id>")
+def update_book(book_id):
+    book = validate_book(book_id)
+    # This endpoint relies on reading the HTTP request body. 
+    # We'll use request.get_json() to parse the JSON body into a Python dictionary.
+    request_body = request.get_json()
+
+    book.title = request_body["title"]
+    book.description = request_body["description"]
+    # commit the change to the database, we'll execute db.session.commit().
+    db.session.commit()
+
+    # By using the Response constructor, we can manually create a Response object when we need detailed control over the contents and attributes of the endpoint's response.
+    # use the keyword argument status to set a status code of 204 for our endpoint's response.
+    # Since we construct our own response object we need to set the mimetype for our response to "application/json". 
+    return Response(status=204, mimetype="application/json")
+
+
+################## END 04 Building an API Update

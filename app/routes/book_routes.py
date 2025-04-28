@@ -82,7 +82,50 @@ def create_book():
 
 @books_bp.get("")
 def get_all_books():
-    query = db.select(Book).order_by(Book.id)
+    # 05 Building an API - More Flask Queries
+
+    # Method 1
+    # # check for title in the query params. 
+    # # If it's not present, the get() call will return None, a falsy value.
+    # title_param = request.args.get("title")
+    # if title_param:
+    #     # query = db.select(Book).where(Book.title == title_param).order_by(Book.id) # code that builds a query to filter by title
+    #     # But if we try to send a request looking for apple in the title, GET /books?title=apple, we won't get any results. This is 
+    #     # because the == operator is looking for an exact match, and none of our titles are exactly apple. 
+    #     # QLAlchemy filter by partial string and see what we find. Among the results, 
+    #     # we might learn that we can use the like() method to filter by a partial string.
+    #     # We might also encounter results describing the contains() method, 
+    #     # SELECT * FROM book WHERE title LIKE '%apple%' ORDER BY id;
+    #     # %: matches any characters,
+    #     # == will not work
+    #     # like(). contain() is case sensative
+    #     # Fortunately, PostgreSQL provides the ILIKE operator, which is case-insensitive
+    #     # query = db.select(Book).where(Book.title == title_param).order_by(Book.id) # code that builds a query to filter by title
+    #     # query = db.select(Book).where(Book.title.like(f"%{title_param}%")).order_by(Book.id)
+    #     query = db.select(Book).where(Book.title.ilike(f"%{title_param}%")).order_by(Book.id)
+
+    # else:
+    #     query = db.select(Book).order_by(Book.id)
+
+    # remaining code as before
+
+
+    # Method 2 # Reorganize
+    query = db.select(Book)
+
+    title_param = request.args.get("title")
+    if title_param:
+        query = query.where(Book.title.ilike(f"%{title_param}%"))
+
+    description_param = request.args.get("description")
+    if description_param:
+        query = query.where(Book.description.ilike(f"%{description_param}%"))
+
+    query = query.order_by(Book.id)
+
+    # END 05 Building an API - More Flask Queries
+
+    # query = db.select(Book).order_by(Book.id)
     # we used the db.session object and called its scalars method to get a list of models. 
     books = db.session.scalars(query)
     # We could also write the line above as:

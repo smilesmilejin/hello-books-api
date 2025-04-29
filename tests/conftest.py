@@ -5,6 +5,8 @@ from flask.signals import request_finished # We use the @request_finished decora
 from dotenv import load_dotenv # We'll use load_dotenv to manually load the contents of our .env into our environment variables.
 import os # As we did in the root __init__.py file, we'll use os to read our environment variables.
 
+from app.models.book import Book
+
 load_dotenv() # Before we can use our environment variables, we need to invoke the load_dotenv function that we imported.
 
 @pytest.fixture # We'll create and use a pytest fixture named app, which will be used in our client fixture (defined later)
@@ -44,3 +46,19 @@ def app():
 def client(app):
     # The responsibility of this fixture is to make a test client, which is an object able to simulate a client making HTTP requests.
     return app.test_client()
+
+
+
+@pytest.fixture
+def two_saved_books(app):
+    # Arrange
+    ocean_book = Book(title="Ocean Book",
+                      description="watr 4evr")
+    mountain_book = Book(title="Mountain Book",
+                         description="i luv 2 climb rocks")
+
+    db.session.add_all([ocean_book, mountain_book]) # # We can use the add_all() function to add a list of instances
+    # Alternatively, we could do
+    # db.session.add(ocean_book)
+    # db.session.add(mountain_book)
+    db.session.commit()

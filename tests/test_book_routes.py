@@ -29,3 +29,27 @@ def test_get_one_book(client, two_saved_books):
         "title": "Ocean Book",
         "description": "watr 4evr"
     }
+
+# We'll wrap up our foray into API unit testing with a test for our POST route create_book()
+            # tests/test_book_routes.py.
+def test_create_one_book(client):
+    # Act
+    # Sends a POST request to /books, 
+    # with the dict to be used as the JSON request body passed in using the json keyword argument
+    response = client.post("/books", json={
+        "title": "New Book",
+        "description": "The Best!"
+    })
+    # Gets the JSON response body as a Python value. 
+    # Since the create logic returns a dict, we should anticipate response_body to receive a dict result here.
+    response_body = response.get_json()
+
+    # Assert
+
+    assert response.status_code == 201 # Checks for the expected status code
+    # {...}}	Checks for the expected key/value pairs in the response body
+    assert response_body == {
+        "id": 1,
+        "title": "New Book",
+        "description": "The Best!"
+    }

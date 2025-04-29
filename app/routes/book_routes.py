@@ -80,6 +80,12 @@ def create_book():
     }
     return response, 201
 
+# 05 Building an API - Testing 
+# This will cause the test to fail due to incorrect 
+# @books_bp.get("")
+# def get_all_books():
+#     return make_response("I'm a teapot!", 418)
+
 @books_bp.get("")
 def get_all_books():
     # 05 Building an API - More Flask Queries

@@ -61,17 +61,68 @@ from ..db import db
 
 books_bp = Blueprint("books_bp", __name__, url_prefix="/books")
 
+# @books_bp.post("")
+# def create_book():
+#     request_body = request.get_json() # use request to accesss to incoming request data
+#     title = request_body["title"]
+#     description = request_body["description"]
+
+#     new_book = Book(title=title, description=description)
+    
+#     # db.session is the database's way of collecting changes that need to be made.
+#     db.session.add(new_book) # Add new_book to the database
+#     db.session.commit() # database commit the changes
+
+#     response = {
+#         "id": new_book.id,
+#         "title": new_book.title,
+#         "description": new_book.description,
+#     }
+#     return response, 201
+
+# # Added from 07 Building an API -Refactoring
+# @books_bp.post("")
+# def create_book():
+#     request_body = request.get_json()
+
+#     try:
+#         title = request_body["title"]
+#         description = request_body["description"]
+
+#         new_book = Book(title=title, description=description)
+
+#     except KeyError as error:
+#         response = {"message": f"Invalid request: missing {error.args[0]}"}
+#         abort(make_response(response, 400))
+
+#     db.session.add(new_book)
+#     db.session.commit()
+
+#     response = {
+#         "id": new_book.id,
+#         "title": new_book.title,
+#         "description": new_book.description,
+#     }
+#     return response, 201
+# # End from 07 Building an API -Refactoring
+
+# Added from 07 Building an API -Refactoring
+# Updated create_book function example
 @books_bp.post("")
 def create_book():
-    request_body = request.get_json() # use request to accesss to incoming request data
-    title = request_body["title"]
-    description = request_body["description"]
+    request_body = request.get_json()
+    # Question what is request_body is empty?
+    try:
+        new_book = Book.from_dict(request_body)
 
-    new_book = Book(title=title, description=description)
-    
-    # db.session is the database's way of collecting changes that need to be made.
-    db.session.add(new_book) # Add new_book to the database
-    db.session.commit() # database commit the changes
+    except KeyError as error:
+        # print(error) # 'title'
+        # print(error.args) # ('title',)
+        response = {"message": f"Invalid request: missing {error.args[0]}"}
+        abort(make_response(response, 400))
+
+    db.session.add(new_book)
+    db.session.commit()
 
     response = {
         "id": new_book.id,
@@ -79,6 +130,9 @@ def create_book():
         "description": new_book.description,
     }
     return response, 201
+# End from 07 Building an API -Refactoring
+
+
 
 # 05 Building an API - Testing 
 # This will cause the test to fail due to incorrect 

@@ -19,6 +19,17 @@ from ..db import db
 
 # By default, SQLAlchemy will use the lowercase version of this class name as the name of the table it will create.
 class Book(db.Model):
+
+    # Added from 07 Building an API - Refactoring
+    # Complete from_dict function example
+    # indented under the Book class definition
+    @classmethod
+    def from_dict(cls, book_data):
+        new_book = Book(title=book_data["title"],
+                        description=book_data["description"])
+        return new_book
+    # End from 07 Building an API - Refactoring
+
     # Instances of Book will have an attribute id, which maps to a database column of type int. 
     # Notice that this attribute goes outside of any instance method and doesn't reference self.
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

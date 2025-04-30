@@ -58,8 +58,16 @@
 from flask import Blueprint, abort, make_response, request, Response
 from app.models.book import Book
 from ..db import db
+from .route_utilities import validate_model
 
-books_bp = Blueprint("books_bp", __name__, url_prefix="/books")
+# Added 07 Building an API -Refactoring Part 3
+# changes books_bp to bp
+# renamed the variable to bp where it is declared
+bp = Blueprint("books_bp", __name__, url_prefix="/books")
+
+# books_bp = Blueprint("books_bp", __name__, url_prefix="/books")
+
+# End 07 Building an API -Refactoring Part 3
 
 # @books_bp.post("")
 # def create_book():
@@ -134,7 +142,7 @@ books_bp = Blueprint("books_bp", __name__, url_prefix="/books")
 
 # Added from 07 Building an API -Refactoring Part 2
 # Updated create_book function
-@books_bp.post("")
+@bp.post("")
 def create_book():
     request_body = request.get_json()
 
@@ -157,7 +165,7 @@ def create_book():
 # def get_all_books():
 #     return make_response("I'm a teapot!", 418)
 
-@books_bp.get("")
+@bp.get("")
 def get_all_books():
     # 05 Building an API - More Flask Queries
 
@@ -224,9 +232,12 @@ def get_all_books():
     return books_response
 
 ################## 04 Building an API Read One Book
-@books_bp.get("/<book_id>")
+@bp.get("/<book_id>")
 def get_one_book(book_id):
-    book = validate_book(book_id)
+    # Added from 07 Building an API - Refactoring Part 3
+    # book = validate_book(book_id)
+    book = validate_model(Book, book_id)
+    # End from 07 Building an API - Refactoring Part 3
 
     # Added from 07 Building an API - Refactoring Part 2
     return book.to_dict()
@@ -238,37 +249,66 @@ def get_one_book(book_id):
     #     "description": book.description,
     # }
 
-def validate_book(book_id):
-    try:
-        book_id = int(book_id)
-    except:
-        # When book_id is not a number
-        response = {"message": f"Book {book_id} invalid"}
-        abort(make_response(response , 400))
+# # Added from 07 Building an API -Refactoring Part 3
+# def validate_book(cls, book_id):
+# # End from 07 Building an API -Refactoring Part 3
+# # def validate_book(book_id):
+#     try:
+#         book_id = int(book_id)
+#     except:
+#         # When book_id is not a number
+#         response = {"message": f"Book {book_id} invalid"}
+#         abort(make_response(response , 400))
 
-    # The query variable above receives a Select object representing the query for the data we are going to retrieve.
-    query = db.select(Book).where(Book.id == book_id)
-    # scalar method: only one result
-    # db.session has another method we can use, scalar, which will only return one result rather than a list.
-    book = db.session.scalar(query)
+#     # The query variable above receives a Select object representing the query for the data we are going to retrieve.
+#     # Added from 07 Building an API -Refactoring Part 3
+#     # query = db.select(Book).where(Book.id == book_id)
+#     query = db.select(cls).where(cls.id == model_id)
+#     # End from 07 Building an API -Refactoring Part 3
+
+#     # scalar method: only one result
+#     # db.session has another method we can use, scalar, which will only return one result rather than a list.
+#     book = db.session.scalar(query)
     
-    # when we execute a query which selects no book records db.session.scalar(query) returns None! 
-    # When book_id does not exist in books
-    if not book:
-        response = {"message": f"Book {book_id} not found"}
-        abort(make_response(response, 404))
+#     # when we execute a query which selects no book records db.session.scalar(query) returns None! 
+#     # When book_id does not exist in books
+#     if not book:
+#         response = {"message": f"Book {book_id} not found"}
+#         abort(make_response(response, 404))
 
-    return book
+#     return book
 
-################## END 04 Building an API Read One Book
+# ################## END 04 Building an API Read One Book
 
+###################  Added from 07 Building an API -Refactoring Part 3
+# def validate_book(cls, book_id):
+#     try:
+#         book_id = int(book_id)
+#     except:
+#         response = {"message": f"{cls.__name__} {book_id} invalid"}
+#         abort(make_response(response , 400))
+
+#     query = db.select(cls).where(cls.id == book_id)
+#     book = db.session.scalar(query)
+
+#     if not book:
+#         response = {"message": f"{cls.__name__} {book_id} not found"}
+#         abort(make_response(response, 404))
+
+#     return book
+
+################### End from 07 Building an API -Refactoring Part 3
 
 ################## 04 Building an API Update
 
 # HTTP method: PUT, endpoint: /<book_id>
-@books_bp.put("/<book_id>")
+@bp.put("/<book_id>")
 def update_book(book_id):
-    book = validate_book(book_id)
+    # Added from 07 Building an API - Refactoring Part 3
+    # book = validate_book(book_id)
+    book = validate_model(Book, book_id)
+    # End from 07 Building an API - Refactoring Part 3
+
     # This endpoint relies on reading the HTTP request body. 
     # We'll use request.get_json() to parse the JSON body into a Python dictionary.
     request_body = request.get_json()
@@ -288,9 +328,13 @@ def update_book(book_id):
 
 ################## 04 Building an API Delete
 
-@books_bp.delete("/<book_id>")
+@bp.delete("/<book_id>")
 def delete_book(book_id):
-    book = validate_book(book_id)
+    # Added from 07 Building an API - Refactoring Part 3
+    # book = validate_book(book_id)
+    book = validate_model(Book, book_id)
+    # End from 07 Building an API - Refactoring Part 3
+
     db.session.delete(book)
     db.session.commit()
 

@@ -180,3 +180,135 @@ def test_get_one_book_invalid_id(client, two_saved_books):
     assert response_body == {"message": "Book cat invalid"}
 
 # End # Added from 07 Building an API -Refactoring Part 2
+
+
+# Added from 07 Building an API -Refactoring Part 3
+# New test cases for update_book and delete_book
+# def test_update_book(client, two_saved_books):
+#     # Arrange
+#     test_data = {
+#         "title": "New Book",
+#         "description": "The Best!"
+#     }
+
+#     # Act
+#     response = client.put("/books/1", json=test_data)
+#     response_body = response.get_json()
+
+#     # Assert
+#     assert response.status_code == 200
+#     assert response_body == "Book #1 successfully updated"
+
+def test_update_book(client, two_saved_books):
+    # Arrange
+    test_data = {
+        "title": "New Book",
+        "description": "The Best!"
+    }
+
+    # Act
+    response = client.put("/books/1", json=test_data)
+
+    # Assert
+    assert response.status_code == 204
+    assert response.content_length is None
+
+# def test_update_book_with_extra_keys(client, two_saved_books):
+#     # Arrange
+#     test_data = {
+#         "extra": "some stuff",
+#         "title": "New Book",
+#         "description": "The Best!",
+#         "another": "last value"
+#     }
+
+#     # Act
+#     response = client.put("/books/1", json=test_data)
+#     response_body = response.get_json()
+
+#     # Assert
+#     assert response.status_code == 200
+#     assert response_body == "Book #1 successfully updated"
+
+def test_update_book_with_extra_keys(client, two_saved_books):
+    # Arrange
+    test_data = {
+        "extra": "some stuff",
+        "title": "New Book",
+        "description": "The Best!",
+        "another": "last value"
+    }
+
+    # Act
+    response = client.put("/books/1", json=test_data)
+
+    # Assert
+    assert response.status_code == 204
+    assert response.content_length is None
+
+def test_update_book_missing_record(client, two_saved_books):
+    # Arrange
+    test_data = {
+        "title": "New Book",
+        "description": "The Best!"
+    }
+
+    # Act
+    response = client.put("/books/3", json=test_data)
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 404
+    assert response_body == {"message": "Book 3 not found"}
+
+def test_update_book_invalid_id(client, two_saved_books):
+    # Arrange
+    test_data = {
+        "title": "New Book",
+        "description": "The Best!"
+    }
+
+    # Act
+    response = client.put("/books/cat", json=test_data)
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert response_body == {"message": "Book cat invalid"}
+
+# def test_delete_book(client, two_saved_books):
+#     # Act
+#     response = client.delete("/books/1")
+#     response_body = response.get_json()
+
+#     # Assert
+#     assert response.status_code == 200
+#     assert response_body == "Book #1 successfully deleted"
+
+def test_delete_book(client, two_saved_books):
+    # Act
+    response = client.delete("/books/1")
+
+    # Assert
+    assert response.status_code == 204
+    assert response.content_length is None
+
+def test_delete_book_missing_record(client, two_saved_books):
+    # Act
+    response = client.delete("/books/3")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 404
+    assert response_body == {"message": "Book 3 not found"}
+
+def test_delete_book_invalid_id(client, two_saved_books):
+    # Act
+    response = client.delete("/books/cat")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert response_body == {"message": "Book cat invalid"}
+# End from 07 Building an API -Refactoring Part 3
+

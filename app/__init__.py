@@ -70,7 +70,15 @@
 from flask import Flask
 from .db import db, migrate
 from .models import book
-from .routes.book_routes import books_bp
+
+# Added from 07 Building an API -Refactoring Part 3
+# Using Alias
+from .routes.book_routes import bp as books_bp
+
+# Method 2
+# from .routes import book_routes
+# End from 07 Building an API -Refactoring Part 3
+
 import os
 
 # We have called the new parameter config which should receive a dictionary of configuration settings. 
@@ -98,8 +106,15 @@ def create_app(config=None):
     db.init_app(app)
     migrate.init_app(app, db)
 
+    ##################### Added from 07 Building an API -Refactoring Part 3
     # Register Blueprints here
     app.register_blueprint(books_bp)
+
+    # Method 2
+    # <module_name>.<symbol_name> to access a specific symbol from the module. 
+    # Register Blueprints here
+    # app.register_blueprint(book_routes.bp)
+    ####################### End from 07 Building an API -Refactoring Part 3
 
     return app
 # # END Added from 06 Building an API -testing

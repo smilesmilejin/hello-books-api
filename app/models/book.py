@@ -44,3 +44,13 @@ class Book(db.Model):
 # If deleting rows with id 1, the next insert will be 2, run the folloiwng query to reset autoincrement in 1 
     # SELECT pg_get_serial_sequence('book', 'id');
     # ALTER SEQUENCE public.book_id_seq RESTART WITH 1;
+
+    # Added from 07 Building an API - Refactoring Part 2
+    def to_dict(self):
+        book_as_dict = {}
+        book_as_dict["id"] = self.id
+        book_as_dict["title"] = self.title
+        book_as_dict["description"] = self.description
+
+        return book_as_dict
+    # End from 07 Building an API - Refactoring Part 2

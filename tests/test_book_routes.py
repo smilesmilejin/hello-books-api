@@ -62,23 +62,23 @@ import pytest
 # The first two cases should fail to create a Book,
 # the request body is missing the title keys. 
 
-# Method 1 for missing title or description keys
-def test_create_one_book_no_title(client):
-    # Arrange
-    test_data = {"description": "The Best!"}
+# # Method 1 for missing title or description keys
+# def test_create_one_book_no_title(client):
+#     # Arrange
+#     test_data = {"description": "The Best!"}
 
-    # Act & Assert
-    with pytest.raises(KeyError, match='title'):
-        response = client.post("/books", json=test_data)
+#     # Act & Assert
+#     with pytest.raises(KeyError, match='title'):
+#         response = client.post("/books", json=test_data)
 
-# the request body is missing description keys. 
-def test_create_one_book_no_description(client):
-    # Arrange
-    test_data = {"title": "New Book"}
+# # the request body is missing description keys. 
+# def test_create_one_book_no_description(client):
+#     # Arrange
+#     test_data = {"title": "New Book"}
 
-    # Act & Assert
-    with pytest.raises(KeyError, match = 'description'):
-        response = client.post("/books", json=test_data)
+#     # Act & Assert
+#     with pytest.raises(KeyError, match = 'description'):
+#         response = client.post("/books", json=test_data)
 
 ################# Method 2 Updated test cases for create_book that check for a 400 Bad Response
 
@@ -130,3 +130,53 @@ def test_create_one_book_with_extra_keys(client):
     }
 
 # End from 07 Building an API -Refactoring
+
+# Added from 07 Building an API -Refactoring Part 2
+# When we have records and a `title` query in the request arguments, `get_all_books` returns a list containing only the `Book`s that match the query
+def test_get_all_books_with_title_query_matching_none(client, two_saved_books):
+    # Act
+    data = {'title': 'Desert Book'}
+    response = client.get("/books", query_string = data)
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 200
+    assert response_body == []
+
+# When we have records and a `title` query in the request arguments, `get_all_books` returns a list containing only the `Book`s that match the query
+def test_get_all_books_with_title_query_matching_one(client, two_saved_books):
+    # Act
+    data = {'title': 'Ocean Book'}
+    response = client.get("/books", query_string = data)
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 200
+    assert len(response_body) == 1
+    assert response_body[0] == {
+        "id": 1,
+        "title": "Ocean Book",
+        "description": "watr 4evr"
+    }
+
+# When we call `get_one_book` with a numeric ID that doesn't have a record, we get the expected error message
+def test_get_one_book_missing_record(client, two_saved_books):
+    # Act
+    response = client.get("/books/3")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 404
+    assert response_body == {"message": "Book 3 not found"}
+
+# When we call `get_one_book` with a non-numeric ID, we get the expected error message
+def test_get_one_book_invalid_id(client, two_saved_books):
+    # Act
+    response = client.get("/books/cat")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert response_body == {"message": "Book cat invalid"}
+
+# End # Added from 07 Building an API -Refactoring Part 2

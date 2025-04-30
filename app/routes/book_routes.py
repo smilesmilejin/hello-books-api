@@ -106,33 +106,50 @@ books_bp = Blueprint("books_bp", __name__, url_prefix="/books")
 #     return response, 201
 # # End from 07 Building an API -Refactoring
 
-# Added from 07 Building an API -Refactoring
-# Updated create_book function example
+# # Added from 07 Building an API -Refactoring
+# # Updated create_book function example
+# @books_bp.post("")
+# def create_book():
+#     request_body = request.get_json()
+#     # Question what is request_body is empty?
+#     try:
+#         new_book = Book.from_dict(request_body)
+
+#     except KeyError as error:
+#         # print(error) # 'title'
+#         # print(error.args) # ('title',)
+#         response = {"message": f"Invalid request: missing {error.args[0]}"}
+#         abort(make_response(response, 400))
+
+#     db.session.add(new_book)
+#     db.session.commit()
+
+#     response = {
+#         "id": new_book.id,
+#         "title": new_book.title,
+#         "description": new_book.description,
+#     }
+#     return response, 201
+# # End from 07 Building an API -Refactoring
+
+# Added from 07 Building an API -Refactoring Part 2
+# Updated create_book function
 @books_bp.post("")
 def create_book():
     request_body = request.get_json()
-    # Question what is request_body is empty?
+
     try:
         new_book = Book.from_dict(request_body)
 
     except KeyError as error:
-        # print(error) # 'title'
-        # print(error.args) # ('title',)
         response = {"message": f"Invalid request: missing {error.args[0]}"}
         abort(make_response(response, 400))
 
     db.session.add(new_book)
     db.session.commit()
 
-    response = {
-        "id": new_book.id,
-        "title": new_book.title,
-        "description": new_book.description,
-    }
-    return response, 201
-# End from 07 Building an API -Refactoring
-
-
+    return new_book.to_dict(), 201
+# End from 07 Building an API -Refactoring Part 2
 
 # 05 Building an API - Testing 
 # This will cause the test to fail due to incorrect 
@@ -193,13 +210,17 @@ def get_all_books():
 
     books_response = []
     for book in books:
-        books_response.append(
-            {
-                "id": book.id,
-                "title": book.title,
-                "description": book.description
-            }
-        )
+        # books_response.append(
+        #     {
+        #         "id": book.id,
+        #         "title": book.title,
+        #         "description": book.description
+        #     }
+        # )
+
+        ## Added from 07 Building an API - Refactoring Part 2
+        books_response.append(book.to_dict())
+        ## End from 07 Building an API - Refactoring Part 2
     return books_response
 
 ################## 04 Building an API Read One Book
@@ -207,18 +228,22 @@ def get_all_books():
 def get_one_book(book_id):
     book = validate_book(book_id)
 
-    return {
-        "id": book.id,
-        "title": book.title,
-        "description": book.description,
-    }
+    # Added from 07 Building an API - Refactoring Part 2
+    return book.to_dict()
+    # End from 07 Building an API - Refactoring Part 2
+    
+    # return {
+    #     "id": book.id,
+    #     "title": book.title,
+    #     "description": book.description,
+    # }
 
 def validate_book(book_id):
     try:
         book_id = int(book_id)
     except:
         # When book_id is not a number
-        response = {"message": f"book {book_id} invalid"}
+        response = {"message": f"Book {book_id} invalid"}
         abort(make_response(response , 400))
 
     # The query variable above receives a Select object representing the query for the data we are going to retrieve.
@@ -230,7 +255,7 @@ def validate_book(book_id):
     # when we execute a query which selects no book records db.session.scalar(query) returns None! 
     # When book_id does not exist in books
     if not book:
-        response = {"message": f"book {book_id} not found"}
+        response = {"message": f"Book {book_id} not found"}
         abort(make_response(response, 404))
 
     return book

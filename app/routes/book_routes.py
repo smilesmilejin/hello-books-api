@@ -58,7 +58,7 @@
 from flask import Blueprint, abort, make_response, request, Response
 from app.models.book import Book
 from ..db import db
-from .route_utilities import validate_model
+from .route_utilities import validate_model, create_model, get_models_with_filters
 
 # Added 07 Building an API -Refactoring Part 3
 # changes books_bp to bp
@@ -142,21 +142,21 @@ bp = Blueprint("books_bp", __name__, url_prefix="/books")
 
 # Added from 07 Building an API -Refactoring Part 2
 # Updated create_book function
-@bp.post("")
-def create_book():
-    request_body = request.get_json()
+# @bp.post("")
+# def create_book():
+#     request_body = request.get_json()
 
-    try:
-        new_book = Book.from_dict(request_body)
+#     try:
+#         new_book = Book.from_dict(request_body)
 
-    except KeyError as error:
-        response = {"message": f"Invalid request: missing {error.args[0]}"}
-        abort(make_response(response, 400))
+#     except KeyError as error:
+#         response = {"message": f"Invalid request: missing {error.args[0]}"}
+#         abort(make_response(response, 400))
 
-    db.session.add(new_book)
-    db.session.commit()
+#     db.session.add(new_book)
+#     db.session.commit()
 
-    return new_book.to_dict(), 201
+#     return new_book.to_dict(), 201
 # End from 07 Building an API -Refactoring Part 2
 
 # 05 Building an API - Testing 
@@ -165,71 +165,71 @@ def create_book():
 # def get_all_books():
 #     return make_response("I'm a teapot!", 418)
 
-@bp.get("")
-def get_all_books():
-    # 05 Building an API - More Flask Queries
+# @bp.get("")
+# def get_all_books():
+#     # 05 Building an API - More Flask Queries
 
-    # Method 1
-    # # check for title in the query params. 
-    # # If it's not present, the get() call will return None, a falsy value.
-    # title_param = request.args.get("title")
-    # if title_param:
-    #     # query = db.select(Book).where(Book.title == title_param).order_by(Book.id) # code that builds a query to filter by title
-    #     # But if we try to send a request looking for apple in the title, GET /books?title=apple, we won't get any results. This is 
-    #     # because the == operator is looking for an exact match, and none of our titles are exactly apple. 
-    #     # QLAlchemy filter by partial string and see what we find. Among the results, 
-    #     # we might learn that we can use the like() method to filter by a partial string.
-    #     # We might also encounter results describing the contains() method, 
-    #     # SELECT * FROM book WHERE title LIKE '%apple%' ORDER BY id;
-    #     # %: matches any characters,
-    #     # == will not work
-    #     # like(). contain() is case sensative
-    #     # Fortunately, PostgreSQL provides the ILIKE operator, which is case-insensitive
-    #     # query = db.select(Book).where(Book.title == title_param).order_by(Book.id) # code that builds a query to filter by title
-    #     # query = db.select(Book).where(Book.title.like(f"%{title_param}%")).order_by(Book.id)
-    #     query = db.select(Book).where(Book.title.ilike(f"%{title_param}%")).order_by(Book.id)
+#     # Method 1
+#     # # check for title in the query params. 
+#     # # If it's not present, the get() call will return None, a falsy value.
+#     # title_param = request.args.get("title")
+#     # if title_param:
+#     #     # query = db.select(Book).where(Book.title == title_param).order_by(Book.id) # code that builds a query to filter by title
+#     #     # But if we try to send a request looking for apple in the title, GET /books?title=apple, we won't get any results. This is 
+#     #     # because the == operator is looking for an exact match, and none of our titles are exactly apple. 
+#     #     # QLAlchemy filter by partial string and see what we find. Among the results, 
+#     #     # we might learn that we can use the like() method to filter by a partial string.
+#     #     # We might also encounter results describing the contains() method, 
+#     #     # SELECT * FROM book WHERE title LIKE '%apple%' ORDER BY id;
+#     #     # %: matches any characters,
+#     #     # == will not work
+#     #     # like(). contain() is case sensative
+#     #     # Fortunately, PostgreSQL provides the ILIKE operator, which is case-insensitive
+#     #     # query = db.select(Book).where(Book.title == title_param).order_by(Book.id) # code that builds a query to filter by title
+#     #     # query = db.select(Book).where(Book.title.like(f"%{title_param}%")).order_by(Book.id)
+#     #     query = db.select(Book).where(Book.title.ilike(f"%{title_param}%")).order_by(Book.id)
 
-    # else:
-    #     query = db.select(Book).order_by(Book.id)
+#     # else:
+#     #     query = db.select(Book).order_by(Book.id)
 
-    # remaining code as before
+#     # remaining code as before
 
 
-    # Method 2 # Reorganize
-    query = db.select(Book)
+#     # Method 2 # Reorganize
+#     query = db.select(Book)
 
-    title_param = request.args.get("title")
-    if title_param:
-        query = query.where(Book.title.ilike(f"%{title_param}%"))
+#     title_param = request.args.get("title")
+#     if title_param:
+#         query = query.where(Book.title.ilike(f"%{title_param}%"))
 
-    description_param = request.args.get("description")
-    if description_param:
-        query = query.where(Book.description.ilike(f"%{description_param}%"))
+#     description_param = request.args.get("description")
+#     if description_param:
+#         query = query.where(Book.description.ilike(f"%{description_param}%"))
 
-    query = query.order_by(Book.id)
+#     query = query.order_by(Book.id)
 
-    # END 05 Building an API - More Flask Queries
+#     # END 05 Building an API - More Flask Queries
 
-    # query = db.select(Book).order_by(Book.id)
-    # we used the db.session object and called its scalars method to get a list of models. 
-    books = db.session.scalars(query)
-    # We could also write the line above as:
-    # books = db.session.execute(query).scalars()
+#     # query = db.select(Book).order_by(Book.id)
+#     # we used the db.session object and called its scalars method to get a list of models. 
+#     books = db.session.scalars(query)
+#     # We could also write the line above as:
+#     # books = db.session.execute(query).scalars()
 
-    books_response = []
-    for book in books:
-        # books_response.append(
-        #     {
-        #         "id": book.id,
-        #         "title": book.title,
-        #         "description": book.description
-        #     }
-        # )
+#     books_response = []
+#     for book in books:
+#         # books_response.append(
+#         #     {
+#         #         "id": book.id,
+#         #         "title": book.title,
+#         #         "description": book.description
+#         #     }
+#         # )
 
-        ## Added from 07 Building an API - Refactoring Part 2
-        books_response.append(book.to_dict())
-        ## End from 07 Building an API - Refactoring Part 2
-    return books_response
+#         ## Added from 07 Building an API - Refactoring Part 2
+#         books_response.append(book.to_dict())
+#         ## End from 07 Building an API - Refactoring Part 2
+#     return books_response
 
 ################## 04 Building an API Read One Book
 @bp.get("/<book_id>")
@@ -341,3 +341,16 @@ def delete_book(book_id):
     return Response(status=204, mimetype="application/json")
 
 ################## END 04 Building an API Delete
+
+
+##################### Added 08 Building an API one-to-many Part 3
+
+@bp.post("")
+def create_book():
+    request_body = request.get_json()
+    return create_model(Book, request_body)
+
+@bp.get("")
+def get_all_books():
+    return get_models_with_filters(Book, request.args)
+##################### End 08 Building an API one-to-many Part 3

@@ -75,6 +75,9 @@ from .models import book
 # Using Alias
 from .routes.book_routes import bp as books_bp
 
+##################### Added from 08 Building an API one-to-many Part 1
+from .routes.author_routes import bp as authors_bp
+
 # Method 2
 # from .routes import book_routes
 # End from 07 Building an API -Refactoring Part 3
@@ -110,6 +113,9 @@ def create_app(config=None):
     # Register Blueprints here
     app.register_blueprint(books_bp)
 
+    ##################### Added from 08 Building an API one-to-many Part 1
+    app.register_blueprint(authors_bp)
+    ##################### End from 08 Building an API one-to-many Part 1
     # Method 2
     # <module_name>.<symbol_name> to access a specific symbol from the module. 
     # Register Blueprints here

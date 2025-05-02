@@ -6,6 +6,7 @@ from dotenv import load_dotenv # We'll use load_dotenv to manually load the cont
 import os # As we did in the root __init__.py file, we'll use os to read our environment variables.
 
 from app.models.book import Book
+from app.models.author import Author
 
 load_dotenv() # Before we can use our environment variables, we need to invoke the load_dotenv function that we imported.
 
@@ -62,3 +63,14 @@ def two_saved_books(app):
     # db.session.add(ocean_book)
     # db.session.add(mountain_book)
     db.session.commit()
+
+##################### Added from 08 Building an API one-to-many Part 1
+# Self
+@pytest.fixture
+def two_saved_authors(app):
+    author_david = Author(name="David")
+    author_frank = Author(name="Frank")
+
+    db.session.add_all([author_david,author_frank])
+    db.session.commit()
+    

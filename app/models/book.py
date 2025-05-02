@@ -14,8 +14,14 @@
  ############## End 03 Building an API: Comment the hardcoded books data 
 
 ################## Added from 03 Building an API
-from sqlalchemy.orm import Mapped, mapped_column # This file needs access to SQLAlchemy's tools for defining table columns in a model
+# from sqlalchemy.orm import Mapped, mapped_column # This file needs access to SQLAlchemy's tools for defining table columns in a model
+# from ..db import db
+##################### Added from 08 Building an API one-to-many Part 1
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey
+from typing import Optional
 from ..db import db
+##################### End from 08 Building an API one-to-many Part 1
 
 # By default, SQLAlchemy will use the lowercase version of this class name as the name of the table it will create.
 class Book(db.Model):
@@ -40,6 +46,15 @@ class Book(db.Model):
     # Creates a required description attribute, which maps to a string column, description
     # To mark a text column as nullable, we would need to add Optional to the type hint, written as Mapped[Optional[str]].
     description: Mapped[str]
+
+    ##################### Added from 08 Building an API one-to-many Part 1
+    # For example, while Mapped[Optional[int]] declares a nullable integer column, 
+    # Mapped[int] declares an integer column that disallows NULL values, just as Mapped[str] declares a required string column.
+    # Defining Relationships as Optional or Required
+    author_id: Mapped[Optional[int]] = mapped_column(ForeignKey("author.id"))
+    author: Mapped[Optional["Author"]] = relationship(back_populates="books")
+
+    ##################### End from 08 Building an API one-to-many Part 1
 
 # If deleting rows with id 1, the next insert will be 2, run the folloiwng query to reset autoincrement in 1 
     # SELECT pg_get_serial_sequence('book', 'id');

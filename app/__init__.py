@@ -69,7 +69,7 @@
 # # Added from 06 Building an API -testing
 from flask import Flask
 from .db import db, migrate
-from .models import book
+from .models import book, author, genre
 
 # Added from 07 Building an API -Refactoring Part 3
 # Using Alias
@@ -77,6 +77,9 @@ from .routes.book_routes import bp as books_bp
 
 ##################### Added from 08 Building an API one-to-many Part 1
 from .routes.author_routes import bp as authors_bp
+
+##################### Added from 10 Building an API many-to-many
+from .routes.genre_routes import bp as genres_bp
 
 # Method 2
 # from .routes import book_routes
@@ -121,6 +124,11 @@ def create_app(config=None):
     # Register Blueprints here
     # app.register_blueprint(book_routes.bp)
     ####################### End from 07 Building an API -Refactoring Part 3
+    
+
+    ##################### Added from 10 Building an API many-to-many
+    app.register_blueprint(genres_bp)
+
 
     return app
 # # END Added from 06 Building an API -testing

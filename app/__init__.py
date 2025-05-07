@@ -69,7 +69,8 @@
 # # Added from 06 Building an API -testing
 from flask import Flask
 from .db import db, migrate
-from .models import book, author, genre
+##################### Added from 10 Building an API many-to-many
+from .models import book, author, genre, book_genre
 
 # Added from 07 Building an API -Refactoring Part 3
 # Using Alias
@@ -80,6 +81,7 @@ from .routes.author_routes import bp as authors_bp
 
 ##################### Added from 10 Building an API many-to-many
 from .routes.genre_routes import bp as genres_bp
+
 
 # Method 2
 # from .routes import book_routes
